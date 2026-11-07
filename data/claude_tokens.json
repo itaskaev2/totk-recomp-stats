@@ -92,11 +92,11 @@
 {
 "day": "2026-11-07",
 "model": "claude-opus-5-5",
-"input": 496,
-"cache_write": 688550,
-"cache_read": 46087370,
-"output": 146440,
-"messages": 241,
+"input": 530,
+"cache_write": 707521,
+"cache_read": 51298916,
+"output": 156823,
+"messages": 257,
 "subagent_messages": 0
 }
 ]
