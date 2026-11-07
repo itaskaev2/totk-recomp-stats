@@ -1,0 +1,62 @@
+[
+{
+"tool": "Bash",
+"calls": 4090
+},
+{
+"tool": "Read",
+"calls": 346
+},
+{
+"tool": "update_plan",
+"calls": 322
+},
+{
+"tool": "PowerShell",
+"calls": 249
+},
+{
+"tool": "Edit",
+"calls": 176
+},
+{
+"tool": "wrap_up",
+"calls": 156
+},
+{
+"tool": "Write",
+"calls": 120
+},
+{
+"tool": "ToolSearch",
+"calls": 31
+},
+{
+"tool": "chrome:javascript_tool",
+"calls": 25
+},
+{
+"tool": "SendUserFile",
+"calls": 21
+},
+{
+"tool": "chrome:find",
+"calls": 19
+},
+{
+"tool": "TaskStop",
+"calls": 16
+},
+{
+"tool": "chrome:file_upload",
+"calls": 16
+},
+{
+"tool": "chrome:navigate",
+"calls": 15
+},
+{
+"tool": "other",
+"calls": 76
+}
+]

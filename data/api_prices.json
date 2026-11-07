@@ -1,0 +1,23 @@
+[
+{
+"model": "claude-opus-5-5",
+"input": 5,
+"output": 25,
+"cache_write": 6.25,
+"cache_read": 0.5
+},
+{
+"model": "claude-fable-5-1",
+"input": 5,
+"output": 25,
+"cache_write": 6.25,
+"cache_read": 0.5
+},
+{
+"model": "claude-haiku-5-5",
+"input": 1,
+"output": 5,
+"cache_write": 1.25,
+"cache_read": 0.1
+}
+]

@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TOTK PC Recomp Analysis</title>
+<meta name="description" content="Вклад itaskaev2 в valentderah/totk-pc-recomp: ишью, PR, комментарии и расходы Claude Code.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<style>
+  :root {
+    color-scheme: light;
+    --font-anthropic-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-anthropic-serif: "Source Serif 4", Georgia, serif;
+    --color-fg: #1f1e1c; --color-fg-muted: #6b6862; --color-bg: #faf9f6; --color-panel: #ffffff;
+    --color-border-line: #e4e1da; --color-ok: #2e7d4f; --color-warn: #a86b00; --color-bad: #c0392b;
+    --cds-font-size-caption: 12px; --cds-font-size-body: 15px; --cds-font-size-heading: 18px; --cds-font-size-title: 30px;
+    --cds-font-weight-medium: 500;
+    --cds-gap-xs: 4px; --cds-gap-sm: 8px; --cds-gap-md: 16px; --cds-gap-lg: 24px; --cds-gap-xl: 40px;
+    --cds-pad-xs: 4px; --cds-pad-sm: 8px; --cds-pad-md: 12px; --cds-pad-lg: 18px;
+    --cds-radius: 8px;
+    --cds-chart-axis: #c9c5bc; --cds-chart-grid: #ece9e3; --cds-chart-muted: #c4c0b7;
+    --cds-surface-popover: #ffffff; --cds-border: #dcd8cf; --cds-shadow-popover: 0 4px 16px rgba(0,0,0,.12);
+    --cds-text-secondary: #6b6862; --cds-dur-slow: 300ms;
+    --series-1: #2f6fdb; --series-2: #d97a2b; --series-3: #2a9d74; --series-4: #a0569b;
+    --series-5: #c9a227; --series-6: #3aa6b9; --series-7: #d1495b; --series-8: #6c757d;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --color-fg: #ecebe8; --color-fg-muted: #a19e97; --color-bg: #1b1a18; --color-panel: #242320;
+      --color-border-line: #3a3833; --color-ok: #5cc48a; --color-warn: #e0a640; --color-bad: #ef6b5d;
+      --cds-chart-axis: #55524b; --cds-chart-grid: #302e2a; --cds-chart-muted: #5b5850;
+      --cds-surface-popover: #2c2b27; --cds-border: #45423c; --cds-shadow-popover: 0 4px 16px rgba(0,0,0,.5);
+      --cds-text-secondary: #a19e97;
+      --series-1: #6b9cf0; --series-2: #f0a05a; --series-3: #4fc49a; --series-4: #c983c0;
+      --series-5: #e0c050; --series-6: #5cc4d6; --series-7: #f07b8a; --series-8: #9aa1a8;
+    }
+  }
+  html, body { margin: 0; background: var(--color-bg); color: var(--color-fg); font-family: var(--font-anthropic-sans); }
+  #dash-root { max-width: 1200px; margin: 0 auto; padding: 32px clamp(16px, 4vw, 40px) 56px; box-sizing: border-box; }
+  .dash-select { font: inherit; font-size: var(--cds-font-size-caption); padding: 6px 28px 6px 10px; border: 1px solid var(--color-border-line);
+    border-radius: var(--cds-radius); background-color: var(--color-bg); color: var(--color-fg); }
+  .dash-skeleton { color: transparent !important; background: var(--color-border-line); border-radius: 4px; animation: skel 1.2s ease-in-out infinite alternate; }
+  @keyframes skel { from { opacity: .5; } to { opacity: 1; } }
+  .lx-foot { font-size: 12px; color: var(--color-fg-muted); margin-top: 40px; line-height: 1.6; }
+  .lx-foot a { color: inherit; }
+</style>
+<script>
+  // Minimal stand-in for the claude.ai dashboard runtime: loads data/*.json, runs calcs and drawings.
+  window.dash = (() => {
+    const DATASETS = ['github_threads', 'github_comments', 'claude_tokens', 'claude_activity', 'claude_tools', 'api_prices', 'manifest'];
+    const state = {}, calcs = [], draws = new Map();
+    DATASETS.forEach((id) => { state[id] = {status: 'loading', data: []}; });
+    const cs = getComputedStyle(document.documentElement);
+    const colors = [1, 2, 3, 4, 5, 6, 7, 8].map((i) => cs.getPropertyValue('--series-' + i).trim());
+    const runDraw = (name) => {
+      const fn = draws.get(name);
+      if (fn) document.querySelectorAll(`[data-draw="${name}"]`).forEach((el) => { try { fn(el); } catch (e) { console.error(name, e); } });
+    };
+    const runAll = () => draws.forEach((_, name) => runDraw(name));
+    const load = async () => {
+      await Promise.all(DATASETS.map(async (id) => {
+        try {
+          const r = await fetch(`data/${id}.json`, {cache: 'no-cache'});
+          if (!r.ok) throw new Error(r.status);
+          const d = await r.json();
+          state[id] = {status: 'ok', data: Array.isArray(d) ? d : [d]};
+        } catch (e) { state[id] = {status: 'error', data: [], message: String(e)}; }
+      }));
+      for (const c of calcs) {
+        const ins = c.inputs.map((i) => state[i]);
+        if (ins.some((s) => s.status !== 'ok')) { state[c.id] = {status: 'error', data: []}; continue; }
+        try { state[c.id] = {status: 'ok', data: c.fn(...ins.map((s) => s.data))}; }
+        catch (e) { console.error(c.id, e); state[c.id] = {status: 'error', data: []}; }
+      }
+      runAll();
+    };
+    let w = 0;
+    window.addEventListener('resize', () => { if (Math.abs(innerWidth - w) > 4) { w = innerWidth; runAll(); } });
+    document.addEventListener('DOMContentLoaded', () => { w = innerWidth; runAll(); load(); });
+    return {
+      colors,
+      data: (id) => state[id] || {status: 'missing', data: []},
+      calc: (id, spec) => { calcs.push({id, ...spec}); state[id] = {status: 'loading', data: []}; },
+      draw: (name, fn) => { if (fn) draws.set(name, fn); else runDraw(name); },
+      onData: () => {}, refresh: () => {}, params: () => ({}), setParams: () => {}, resetParams: () => {}, setLink: () => {},
+    };
+  })();
+</script>
+</head>
+<body>
+<div id="dash-root">

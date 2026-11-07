@@ -1,0 +1,102 @@
+[
+{
+"day": "2026-10-30",
+"model": "claude-opus-5-5",
+"input": 768,
+"cache_write": 725817,
+"cache_read": 133071539,
+"output": 244233,
+"messages": 348,
+"subagent_messages": 0
+},
+{
+"day": "2026-11-01",
+"model": "claude-opus-5-5",
+"input": 552,
+"cache_write": 1030141,
+"cache_read": 90546171,
+"output": 146630,
+"messages": 256,
+"subagent_messages": 0
+},
+{
+"day": "2026-11-02",
+"model": "claude-opus-5-5",
+"input": 2142,
+"cache_write": 2267207,
+"cache_read": 321311728,
+"output": 783293,
+"messages": 1002,
+"subagent_messages": 0
+},
+{
+"day": "2026-11-03",
+"model": "claude-opus-5-5",
+"input": 1818,
+"cache_write": 2696536,
+"cache_read": 391341502,
+"output": 671184,
+"messages": 835,
+"subagent_messages": 0
+},
+{
+"day": "2026-11-04",
+"model": "claude-opus-5-5",
+"input": 1462,
+"cache_write": 1073218,
+"cache_read": 227686299,
+"output": 427227,
+"messages": 664,
+"subagent_messages": 0
+},
+{
+"day": "2026-11-05",
+"model": "claude-haiku-5-5",
+"input": 4,
+"cache_write": 21936,
+"cache_read": 3224,
+"output": 3442,
+"messages": 2,
+"subagent_messages": 2
+},
+{
+"day": "2026-11-05",
+"model": "claude-opus-5-5",
+"input": 1518,
+"cache_write": 2333981,
+"cache_read": 326804142,
+"output": 472609,
+"messages": 698,
+"subagent_messages": 83
+},
+{
+"day": "2026-11-06",
+"model": "claude-fable-5-1",
+"input": 100,
+"cache_write": 587202,
+"cache_read": 24881339,
+"output": 84013,
+"messages": 50,
+"subagent_messages": 0
+},
+{
+"day": "2026-11-06",
+"model": "claude-opus-5-5",
+"input": 2680,
+"cache_write": 2866917,
+"cache_read": 347697049,
+"output": 752555,
+"messages": 1227,
+"subagent_messages": 71
+},
+{
+"day": "2026-11-07",
+"model": "claude-opus-5-5",
+"input": 496,
+"cache_write": 688550,
+"cache_read": 46087370,
+"output": 146440,
+"messages": 241,
+"subagent_messages": 0
+}
+]

@@ -1,0 +1,719 @@
+<meta name="dash-one-writer">
+<style>
+  .lx { font-family: var(--font-anthropic-sans); color: var(--color-fg); display: flex; flex-direction: column; gap: var(--cds-gap-xl); }
+  .lx h1 { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); margin: 0; }
+  .lx h2 { font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); margin: 0 0 var(--cds-gap-sm); }
+  .lx h3 { font-size: var(--cds-font-size-body); font-weight: var(--cds-font-weight-medium); margin: 0; }
+  .lx p { margin: 0; }
+  .lx .lx-lead { font-size: var(--cds-font-size-body); color: var(--color-fg-muted); max-width: 60rem; line-height: 1.5; margin-top: var(--cds-gap-sm); }
+  .lx .lx-lead b { color: var(--color-fg); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .lx-note { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); margin-top: var(--cds-gap-xs); line-height: 1.4; }
+  .lx-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr)); gap: var(--cds-gap-md); }
+  .lx-tile { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-md) var(--cds-pad-lg); display: flex; flex-direction: column; gap: var(--cds-gap-xs); }
+  .lx-tile .lx-label { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+  .lx-tile .lx-big { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); font-variant-numeric: tabular-nums; line-height: 1.15; min-height: 1.15em; }
+  .lx-tile .lx-sub { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); font-variant-numeric: tabular-nums; }
+  .lx .lx-sub b, .lx .lx-note b { font-weight: 600; color: var(--color-fg); }
+  .lx-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); gap: var(--cds-gap-md); }
+  .lx-card { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-lg); min-width: 0; }
+  .lx-chart { position: relative; min-height: 160px; margin-top: var(--cds-gap-md); }
+  .lx-chart.lx-tall { min-height: 220px; }
+  .lx-chart svg { display: block; overflow: visible; }
+  .lx-chart text { fill: var(--color-fg-muted); font-size: var(--cds-font-size-caption); font-family: var(--font-anthropic-sans); }
+  .lx-chart .lx-val { fill: var(--color-fg); font-variant-numeric: tabular-nums; }
+  .lx-fail { display: flex; align-items: center; justify-content: center; gap: var(--cds-gap-xs); min-height: inherit; color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+  .lx-fail::before { content: ""; width: .375rem; height: .375rem; border-radius: 50%; background: var(--color-bad); }
+  .lx-tip { position: absolute; pointer-events: none; background: var(--cds-surface-popover); border: 1px solid var(--cds-border); border-radius: var(--cds-radius); box-shadow: var(--cds-shadow-popover); padding: var(--cds-pad-xs) var(--cds-pad-sm); font-size: var(--cds-font-size-caption); white-space: nowrap; z-index: 2; }
+  .lx-tip .lx-tip-h { color: var(--cds-text-secondary); }
+  .lx-tip .lx-tip-v { font-variant-numeric: tabular-nums; }
+  .lx-legend { display: flex; flex-wrap: wrap; gap: var(--cds-gap-xs) var(--cds-gap-md); font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); margin-top: var(--cds-gap-sm); }
+  .lx-legend span { display: inline-flex; align-items: center; gap: var(--cds-gap-xs); }
+  .lx-sw { display: inline-block; width: .65rem; height: .65rem; border-radius: 2px; }
+  .lx-mix-row { display: grid; grid-template-columns: .65rem 1fr auto auto; gap: var(--cds-gap-sm); align-items: center; font-size: var(--cds-font-size-caption); padding: 2px 0; font-variant-numeric: tabular-nums; }
+  .lx-mix-row .lx-dim { color: var(--color-fg-muted); text-align: right; min-width: 4.5rem; }
+  .lx-mix-row .lx-cost { text-align: right; min-width: 4rem; }
+  .lx-controls { display: flex; flex-wrap: wrap; gap: var(--cds-gap-sm); align-items: center; margin: var(--cds-gap-md) 0 var(--cds-gap-sm); }
+  .lx-controls input { font: inherit; font-size: var(--cds-font-size-caption); padding: 6px 10px; border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); background: var(--color-bg); color: var(--color-fg); min-width: 12rem; flex: 1 1 12rem; max-width: 24rem; }
+  .lx-controls .lx-count { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); margin-left: auto; }
+  .lx-tbl-wrap { max-height: 32rem; overflow: auto; }
+  .lx-tbl { width: 100%; border-collapse: collapse; font-size: var(--cds-font-size-caption); font-variant-numeric: tabular-nums; }
+  .lx-tbl th { position: sticky; top: 0; background: var(--color-panel); text-align: left; border-bottom: 1px solid var(--color-border-line); padding: 0; z-index: 1; }
+  .lx-tbl th button { all: unset; cursor: pointer; display: block; padding: 6px 8px; color: var(--color-fg-muted); font-weight: var(--cds-font-weight-medium); white-space: nowrap; }
+  .lx-tbl th[aria-sort] button { color: var(--color-fg); }
+  .lx-tbl th.lx-num, .lx-tbl td.lx-num { text-align: right; }
+  .lx-tbl th.lx-num button { text-align: right; }
+  .lx-tbl td:last-child { white-space: nowrap; }
+  .lx-tbl td { padding: 6px 8px; border-bottom: 1px solid var(--color-border-line); vertical-align: top; }
+  .lx-tbl td a { color: var(--color-fg); text-decoration: none; }
+  .lx-tbl td a:hover { text-decoration: underline; }
+  .lx-tbl tr.lx-mine td:first-child { box-shadow: inset 3px 0 0 var(--lx-accent, currentColor); }
+  .lx-pill { display: inline-block; padding: 1px 6px; border-radius: 999px; border: 1px solid var(--color-border-line); }
+  @media (max-width: 640px) { .lx-tbl .lx-hide { display: none; } }
+  .lx details { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); line-height: 1.5; }
+  .lx details summary { cursor: pointer; color: var(--color-fg); font-size: var(--cds-font-size-body); }
+  .lx details dl { display: grid; grid-template-columns: minmax(8rem, 14rem) 1fr; gap: var(--cds-gap-xs) var(--cds-gap-md); margin: var(--cds-gap-md) 0; }
+  .lx details dt { color: var(--color-fg); }
+  .lx details dd { margin: 0; }
+  @media (max-width: 520px) { .lx details dl { grid-template-columns: 1fr; } }
+  [data-dash-source-state=refreshing] { opacity: .5; transition: opacity var(--cds-dur-slow); }
+</style>
+
+<div class="lx">
+  <header id="top">
+    <h1>TOTK PC Recomp Analysis</h1>
+    <p class="lx-lead">С <b data-draw="kpi" data-source="efficiency" data-field="period_start" data-row="0" data-fmt="date">—</b> по <b data-draw="kpi" data-source="efficiency" data-field="period_end" data-row="0" data-fmt="date">—</b> (<b data-draw="kpi" data-source="efficiency" data-field="days" data-row="0">—</b> дней) в valentderah/totk-pc-recomp: <b data-draw="kpi" data-source="gh_kpi" data-field="my_prs" data-row="0">—</b> своих PR, из них приняты <b data-draw="kpi" data-source="gh_kpi" data-field="my_prs_accepted" data-row="0">—</b>; <b data-draw="kpi" data-source="gh_kpi" data-field="comments" data-row="0">—</b> комментариев, после которых закрыто <b data-draw="kpi" data-source="gh_kpi" data-field="prs_closed_after" data-row="0">—</b> чужих PR. Работа Claude Code по API-тарифам стоила бы около <b data-draw="kpi" data-source="claude_kpi" data-field="cost" data-row="0" data-fmt="usd">—</b>, то есть в <b data-draw="kpi" data-source="efficiency" data-field="api_vs_sub" data-row="0" data-fmt="x">—</b> больше месячной подписки за <b data-draw="kpi" data-source="efficiency" data-field="subscription" data-row="0" data-fmt="usd">—</b>, которая всё это покрыла.</p>
+  </header>
+
+  <section id="github">
+    <h2>GitHub: ишью, PR и комментарии</h2>
+    <div class="lx-tiles">
+      <div class="lx-tile">
+        <span class="lx-label">Ишью отработано</span>
+        <span class="lx-big" data-draw="kpi" data-source="gh_kpi" data-field="issues_worked" data-row="0">—</span>
+        <span class="lx-sub">своих <b data-draw="kpi" data-source="gh_kpi" data-field="issues_opened" data-row="0">—</b> · закрыто после комментария <b data-draw="kpi" data-source="gh_kpi" data-field="issues_closed_after" data-row="0">—</b></span>
+      </div>
+      <div class="lx-tile">
+        <span class="lx-label">Чужих PR отработано</span>
+        <span class="lx-big" data-draw="kpi" data-source="gh_kpi" data-field="prs_reviewed" data-row="0">—</span>
+        <span class="lx-sub">ревью, тесты и отзывы</span>
+      </div>
+      <div class="lx-tile">
+        <span class="lx-label">Закрыто PR после моих комментариев</span>
+        <span class="lx-big" data-draw="kpi" data-source="gh_kpi" data-field="prs_closed_after" data-row="0">—</span>
+        <span class="lx-sub">влиты <b data-draw="kpi" data-source="gh_kpi" data-field="prs_merged_after" data-row="0">—</b> · отклонены <b data-draw="kpi" data-source="gh_kpi" data-field="prs_rejected_after" data-row="0">—</b></span>
+      </div>
+      <div class="lx-tile">
+        <span class="lx-label">Мои PR</span>
+        <span class="lx-big" data-draw="kpi" data-source="gh_kpi" data-field="my_prs" data-row="0">—</span>
+        <span class="lx-sub">приняты <b data-draw="kpi" data-source="gh_kpi" data-field="my_prs_accepted" data-row="0">—</b> · открыты <b data-draw="kpi" data-source="gh_kpi" data-field="my_prs_open" data-row="0">—</b> · закрыты <b data-draw="kpi" data-source="gh_kpi" data-field="my_prs_closed" data-row="0">—</b></span>
+      </div>
+      <div class="lx-tile">
+        <span class="lx-label">Комментариев написано</span>
+        <span class="lx-big" data-draw="kpi" data-source="gh_kpi" data-field="comments" data-row="0">—</span>
+        <span class="lx-sub">в чужих тредах <b data-draw="kpi" data-source="gh_kpi" data-field="comments_on_others" data-row="0">—</b></span>
+      </div>
+      <div class="lx-tile">
+        <span class="lx-label">Доля принятых моих PR</span>
+        <span class="lx-big" data-draw="kpi" data-source="gh_kpi" data-field="accept_rate" data-row="0" data-fmt="pct">—</span>
+        <span class="lx-sub">из решённых · медиана до мержа <b data-draw="kpi" data-source="gh_kpi" data-field="median_days_to_merge" data-row="0" data-fmt="d1">—</b> дн.</span>
+      </div>
+    </div>
+
+    <div class="lx-grid" style="margin-top: var(--cds-gap-md)">
+      <div class="lx-card">
+        <h3>Чем закончились PR</h3>
+        <p class="lx-note">Мои PR и чужие PR, где я оставил комментарий. «Влит вручную» — мейнтейнер забрал код своим merge-коммитом и закрыл PR.</p>
+        <div class="lx-chart" style="min-height: 112px" data-draw="outcomes" data-source="pr_outcomes"></div>
+        <div class="lx-legend">
+          <span><i class="lx-sw" data-k="merged"></i>влит</span>
+          <span><i class="lx-sw" data-k="landed"></i>влит вручную</span>
+          <span><i class="lx-sw" data-k="open"></i>открыт</span>
+          <span><i class="lx-sw" data-k="closed"></i>закрыт без мержа</span>
+        </div>
+      </div>
+      <div class="lx-card">
+        <h3>Код в моих PR</h3>
+        <p class="lx-note">Строки по данным GitHub, включая закрытые и открытые PR.</p>
+        <div class="lx-tiles" style="margin-top: var(--cds-gap-md)">
+          <div><span class="lx-note">Добавлено строк</span><div class="lx-big" style="font-family: var(--font-anthropic-serif); font-size: var(--cds-font-size-title); color: var(--color-ok)" data-draw="kpi" data-source="gh_kpi" data-field="lines_added" data-row="0">—</div></div>
+          <div><span class="lx-note">Удалено строк</span><div class="lx-big" style="font-family: var(--font-anthropic-serif); font-size: var(--cds-font-size-title); color: var(--color-bad)" data-draw="kpi" data-source="gh_kpi" data-field="lines_deleted" data-row="0">—</div></div>
+        </div>
+        <p class="lx-note" style="margin-top: var(--cds-gap-md)">Самый большой — BotW 1.9.0 и лаунчер (закрыт), затем меню на языках игры и The Second Quest (открыты).</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="claude">
+    <h2>Claude Code: деньги, время, токены</h2>
+    <div class="lx-tiles">
+      <div class="lx-tile">
+        <span class="lx-label">Потрачено фактически</span>
+        <span class="lx-big" data-draw="kpi" data-source="efficiency" data-field="subscription" data-row="0" data-fmt="usd">—</span>
+        <span class="lx-sub">подписка в месяц · за период ≈ <b data-draw="kpi" data-source="efficiency" data-field="sub_prorated" data-row="0" data-fmt="usd">—</b></span>
+      </div>
+      <div class="lx-tile">
+        <span class="lx-label">Стоило бы по API</span>
+        <span class="lx-big" data-draw="kpi" data-source="claude_kpi" data-field="cost" data-row="0" data-fmt="usd">—</span>
+        <span class="lx-sub">в <b data-draw="kpi" data-source="efficiency" data-field="api_vs_prorated" data-row="0" data-fmt="x">—</b> больше доли подписки за период</span>
+      </div>
+      <div class="lx-tile">
+        <span class="lx-label">Время работы</span>
+        <span class="lx-big" data-draw="kpi" data-source="claude_kpi" data-field="active_hours" data-row="0" data-fmt="h">—</span>
+        <span class="lx-sub">активных дней <b data-draw="kpi" data-source="claude_kpi" data-field="active_days" data-row="0">—</b> · в среднем <b data-draw="kpi" data-source="efficiency" data-field="hours_per_active_day" data-row="0" data-fmt="h">—</b> в день</span>
+      </div>
+      <div class="lx-tile">
+        <span class="lx-label">Токенов всего</span>
+        <span class="lx-big" data-draw="kpi" data-source="claude_kpi" data-field="tokens" data-row="0" data-fmt="compact">—</span>
+        <span class="lx-sub">из них новых (ввод + вывод + запись в кэш) <b data-draw="kpi" data-source="claude_kpi" data-field="fresh_tokens" data-row="0" data-fmt="compact">—</b></span>
+      </div>
+      <div class="lx-tile">
+        <span class="lx-label">Мои запросы</span>
+        <span class="lx-big" data-draw="kpi" data-source="claude_kpi" data-field="prompts" data-row="0">—</span>
+        <span class="lx-sub">ответов модели <b data-draw="kpi" data-source="claude_kpi" data-field="messages" data-row="0">—</b></span>
+      </div>
+      <div class="lx-tile">
+        <span class="lx-label">Вызовов инструментов</span>
+        <span class="lx-big" data-draw="kpi" data-source="claude_kpi" data-field="tool_calls" data-row="0">—</span>
+        <span class="lx-sub">на один мой запрос <b data-draw="kpi" data-source="efficiency" data-field="tools_per_prompt" data-row="0" data-fmt="d1">—</b></span>
+      </div>
+    </div>
+
+    <div class="lx-grid" style="margin-top: var(--cds-gap-md)">
+      <div class="lx-card">
+        <h3>Из чего складывается цена по API</h3>
+        <p class="lx-note">Почти все токены — повторное чтение контекста из кэша: длинная сессия перечитывает историю на каждом шаге.</p>
+        <div class="lx-chart" data-draw="mix" data-source="cost_mix"></div>
+      </div>
+      <div class="lx-card">
+        <h3>Какие инструменты вызывал Claude</h3>
+        <p class="lx-note">Все вызовы за период, включая субагентов; первые 14 по числу.</p>
+        <div class="lx-chart lx-tall" data-draw="tools" data-source="claude_tools"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="days">
+    <h2>По дням</h2>
+    <div class="lx-grid">
+      <div class="lx-card">
+        <h3>Комментарии на GitHub</h3>
+        <p class="lx-note">Комментарии в ишью и PR, по дате UTC.</p>
+        <div class="lx-chart" data-draw="bars" data-source="daily" data-metric="comments"></div>
+      </div>
+      <div class="lx-card">
+        <h3>Открыто моих PR</h3>
+        <p class="lx-note">По дате создания PR.</p>
+        <div class="lx-chart" data-draw="bars" data-source="daily" data-metric="prs_opened"></div>
+      </div>
+      <div class="lx-card">
+        <h3>Часы работы с Claude</h3>
+        <p class="lx-note">Паузы длиннее 10 минут не считаются.</p>
+        <div class="lx-chart" data-draw="bars" data-source="daily" data-metric="active_hours" data-fmt="d1"></div>
+      </div>
+      <div class="lx-card">
+        <h3>Стоимость по API, $</h3>
+        <p class="lx-note">Сколько стоил бы день по API-тарифам.</p>
+        <div class="lx-chart" data-draw="bars" data-source="daily" data-metric="api_cost" data-fmt="usd"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="efficiency">
+    <h2>Эффективность</h2>
+    <div class="lx-tiles">
+      <div class="lx-tile">
+        <span class="lx-label">API-цена одного моего PR</span>
+        <span class="lx-big" data-draw="kpi" data-source="efficiency" data-field="cost_per_pr" data-row="0" data-fmt="usd">—</span>
+        <span class="lx-sub">на принятый <b data-draw="kpi" data-source="efficiency" data-field="cost_per_accepted_pr" data-row="0" data-fmt="usd">—</b></span>
+      </div>
+      <div class="lx-tile">
+        <span class="lx-label">API-цена одного треда</span>
+        <span class="lx-big" data-draw="kpi" data-source="efficiency" data-field="cost_per_thread" data-row="0" data-fmt="usd">—</span>
+        <span class="lx-sub">ишью и PR, где я участвовал</span>
+      </div>
+      <div class="lx-tile">
+        <span class="lx-label">API-цена часа работы</span>
+        <span class="lx-big" data-draw="kpi" data-source="efficiency" data-field="cost_per_hour" data-row="0" data-fmt="usd">—</span>
+        <span class="lx-sub">по подписке за период ≈ <b data-draw="kpi" data-source="efficiency" data-field="sub_per_hour" data-row="0" data-fmt="usd2">—</b> в час</span>
+      </div>
+      <div class="lx-tile">
+        <span class="lx-label">Вывод модели в час</span>
+        <span class="lx-big" data-draw="kpi" data-source="efficiency" data-field="output_per_hour" data-row="0" data-fmt="compact">—</span>
+        <span class="lx-sub">токенов, всех токенов <b data-draw="kpi" data-source="efficiency" data-field="tokens_per_hour" data-row="0" data-fmt="compact">—</b></span>
+      </div>
+      <div class="lx-tile">
+        <span class="lx-label">Комментариев в день</span>
+        <span class="lx-big" data-draw="kpi" data-source="efficiency" data-field="comments_per_day" data-row="0" data-fmt="d1">—</span>
+        <span class="lx-sub">тредов в день <b data-draw="kpi" data-source="efficiency" data-field="threads_per_day" data-row="0" data-fmt="d1">—</b></span>
+      </div>
+    </div>
+  </section>
+
+  <section id="threads" class="lx-card">
+    <h3>Все треды, где я участвовал</h3>
+    <p class="lx-note">Мои PR и ишью, а также чужие, где есть мой комментарий. Заголовки сортируют, строка поиска ищет по номеру, названию и автору.</p>
+    <div class="lx-controls">
+      <input type="search" class="lx-q" placeholder="Поиск" aria-label="Поиск по тредам">
+      <select class="dash-select lx-kind" aria-label="Тип">
+        <option value="">Все типы</option>
+        <option value="PR">PR</option>
+        <option value="Issue">Ишью</option>
+      </select>
+      <select class="dash-select lx-mine" aria-label="Автор">
+        <option value="">Все авторы</option>
+        <option value="yes">Только мои</option>
+        <option value="no">Только чужие</option>
+      </select>
+      <span class="lx-count">показано <b data-draw="shown">—</b></span>
+    </div>
+    <div class="lx-tbl-wrap">
+      <table class="lx-tbl" data-source="github_threads" data-row-key="number">
+        <thead><tr>
+          <th data-field="number" aria-sort="descending"><button type="button" data-sort="number">#</button></th>
+          <th data-field="title"><button type="button" data-sort="title">Название</button></th>
+          <th data-field="kind" class="lx-hide"><button type="button" data-sort="kind">Тип</button></th>
+          <th data-field="author" class="lx-hide"><button type="button" data-sort="author">Автор</button></th>
+          <th data-field="outcome"><button type="button" data-sort="outcome">Итог</button></th>
+          <th data-field="my_comments" class="lx-num"><button type="button" data-sort="my_comments">Мои комм.</button></th>
+          <th data-field="additions" class="lx-num lx-hide"><button type="button" data-sort="additions">+строк</button></th>
+          <th data-field="deletions" class="lx-num lx-hide"><button type="button" data-sort="deletions">−строк</button></th>
+          <th data-field="created" class="lx-hide"><button type="button" data-sort="created">Создан</button></th>
+        </tr></thead>
+        <tbody data-draw="threads"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <details id="method">
+    <summary>Как считались цифры</summary>
+    <dl>
+      <dt>Ишью и PR</dt><dd>Снимок GitHub через gh CLI по аккаунту itaskaev2 в valentderah/totk-pc-recomp: треды, которые я открыл, и треды с моим комментарием или ревью.</dd>
+      <dt>Отработанный тред</dt><dd>Свой тред или чужой, где есть хотя бы один мой комментарий.</dd>
+      <dt>Закрыт после комментария</dt><dd>Чужой тред закрыт или влит позже моего первого комментария. Это совпадение по времени, а не доказательство, что закрыли именно из-за комментария.</dd>
+      <dt>Принятый PR</dt><dd>Влит через GitHub или влит вручную: мейнтейнер перенёс код своим merge-коммитом с номером PR (так было с #89, #489, #701, #729), а сам PR закрыл.</dd>
+      <dt>Токены и сессии</dt><dd>Логи Claude Code четырёх сессий проекта (основная, её форк и два продолжения) с их субагентами. Ответы с одним id считаются один раз, поэтому общая история форков не удваивается. Сессии Hermes и другие проекты не входят.</dd>
+      <dt>Время</dt><dd>Сумма промежутков между событиями основной ветки сессий, паузы длиннее 10 минут отброшены. Субагенты, работавшие параллельно, время не добавляют.</dd>
+      <dt>Цена по API</dt><dd>Оценка: токены по типам умножены на цены за миллион токенов из таблицы ниже. Цены приняты, а не взяты из счёта; для Fable взяты те же, что для Opus. Фактически платится только подписка.</dd>
+      <dt>Подписка за период</dt><dd>Месячная подписка, умноженная на долю месяца (дни периода / 30).</dd>
+    </dl>
+    <table class="lx-tbl" data-source="api_prices" data-row-key="model" style="max-width: 36rem">
+      <thead><tr>
+        <th data-field="model"><button type="button" tabindex="-1">Модель</button></th>
+        <th data-field="input" class="lx-num"><button type="button" tabindex="-1">Ввод</button></th>
+        <th data-field="output" class="lx-num"><button type="button" tabindex="-1">Вывод</button></th>
+        <th data-field="cache_write" class="lx-num"><button type="button" tabindex="-1">Запись кэша</button></th>
+        <th data-field="cache_read" class="lx-num"><button type="button" tabindex="-1">Чтение кэша</button></th>
+      </tr></thead>
+      <tbody data-draw="prices"></tbody>
+    </table>
+    <p class="lx-note">Цены в долларах за миллион токенов.</p>
+  </details>
+</div>
+
+<script>
+  // Calculations over the attached datasets.
+  dash.calc('gh_kpi', {
+    title: 'GitHub totals',
+    description: 'Issues, pull requests and comments by itaskaev2 in valentderah/totk-pc-recomp.',
+    inputs: ['github_threads', 'github_comments'],
+    fn: (github_threads, github_comments) => {
+      const mine = github_threads.filter((r) => r.kind === 'PR' && r.mine === 'yes');
+      const others = github_threads.filter((r) => r.kind === 'PR' && r.mine === 'no');
+      const accepted = mine.filter((r) => r.outcome === 'merged' || r.outcome === 'landed');
+      const decided = mine.filter((r) => r.outcome !== 'open');
+      const waits = accepted.map((r) => (Date.parse(r.merged || r.closed) - Date.parse(r.created)) / 864e5).sort((a, b) => a - b);
+      const n = waits.length;
+      const median = n ? (n % 2 ? waits[(n - 1) / 2] : (waits[n / 2 - 1] + waits[n / 2]) / 2) : null;
+      const after = others.filter((r) => r.closed_after_my_comment === 'yes');
+      return [{
+        issues_worked: github_threads.filter((r) => r.kind === 'Issue').length,
+        issues_opened: github_threads.filter((r) => r.kind === 'Issue' && r.mine === 'yes').length,
+        issues_closed_after: github_threads.filter((r) => r.kind === 'Issue' && r.mine === 'no' && r.closed_after_my_comment === 'yes').length,
+        prs_reviewed: others.length,
+        my_prs: mine.length,
+        my_prs_accepted: accepted.length,
+        my_prs_open: mine.filter((r) => r.outcome === 'open').length,
+        my_prs_closed: mine.filter((r) => r.outcome === 'closed').length,
+        accept_rate: decided.length ? accepted.length / decided.length : null,
+        median_days_to_merge: median,
+        lines_added: mine.reduce((s, r) => s + r.additions, 0),
+        lines_deleted: mine.reduce((s, r) => s + r.deletions, 0),
+        comments: github_comments.length,
+        comments_on_others: github_comments.filter((c) => c.on_own_pr === 'no').length,
+        prs_closed_after: after.length,
+        prs_merged_after: after.filter((r) => r.outcome === 'merged').length,
+        prs_rejected_after: after.filter((r) => r.outcome === 'closed').length,
+        threads: github_threads.length,
+      }];
+    },
+  });
+
+  dash.calc('pr_outcomes', {
+    title: 'Pull request outcomes',
+    description: 'My pull requests and others’ pull requests I commented on, counted by outcome.',
+    inputs: ['github_threads'],
+    fn: (github_threads) => {
+      const out = [];
+      for (const group of ['yes', 'no']) {
+        for (const outcome of ['merged', 'landed', 'open', 'closed']) {
+          out.push({group: group === 'yes' ? 'mine' : 'others', outcome,
+            count: github_threads.filter((r) => r.kind === 'PR' && r.mine === group && r.outcome === outcome).length});
+        }
+      }
+      return out;
+    },
+  });
+
+  dash.calc('claude_kpi', {
+    title: 'Claude Code totals',
+    description: 'Tokens, API-equivalent cost, active time, prompts and tool calls of the TotK sessions.',
+    inputs: ['claude_tokens', 'api_prices', 'claude_activity', 'claude_tools'],
+    fn: (claude_tokens, api_prices, claude_activity, claude_tools) => {
+      const price = Object.fromEntries(api_prices.map((p) => [p.model, p]));
+      const t = {input: 0, output: 0, cache_write: 0, cache_read: 0, messages: 0, subagent_messages: 0, cost: 0};
+      for (const r of claude_tokens) {
+        const p = price[r.model] || price['claude-opus-5-5'];
+        for (const k of ['input', 'output', 'cache_write', 'cache_read', 'messages', 'subagent_messages']) t[k] += r[k];
+        t.cost += (r.input * p.input + r.output * p.output + r.cache_write * p.cache_write + r.cache_read * p.cache_read) / 1e6;
+      }
+      return [{
+        ...t,
+        tokens: t.input + t.output + t.cache_write + t.cache_read,
+        fresh_tokens: t.input + t.output + t.cache_write,
+        active_hours: claude_activity.reduce((s, r) => s + r.active_hours, 0),
+        active_days: claude_activity.filter((r) => r.active_hours > 0).length,
+        prompts: claude_activity.reduce((s, r) => s + r.prompts, 0),
+        tool_calls: claude_tools.reduce((s, r) => s + r.calls, 0),
+      }];
+    },
+  });
+
+  dash.calc('cost_mix', {
+    title: 'API cost by token type',
+    description: 'Tokens and API-equivalent cost split into cache reads, cache writes, output and input.',
+    inputs: ['claude_tokens', 'api_prices'],
+    fn: (claude_tokens, api_prices) => {
+      const price = Object.fromEntries(api_prices.map((p) => [p.model, p]));
+      return ['cache_read', 'output', 'cache_write', 'input'].map((type) => {
+        let tokens = 0, cost = 0;
+        for (const r of claude_tokens) {
+          const p = price[r.model] || price['claude-opus-5-5'];
+          tokens += r[type];
+          cost += r[type] * p[type] / 1e6;
+        }
+        return {type, tokens, cost};
+      });
+    },
+  });
+
+  dash.calc('daily', {
+    title: 'Activity per day',
+    description: 'Comments, pull requests opened, Claude hours and API-equivalent cost for each day of the period.',
+    inputs: ['claude_tokens', 'api_prices', 'claude_activity', 'github_comments', 'github_threads'],
+    fn: (claude_tokens, api_prices, claude_activity, github_comments, github_threads) => {
+      const price = Object.fromEntries(api_prices.map((p) => [p.model, p]));
+      const m = new Map();
+      const get = (day) => {
+        if (!m.has(day)) m.set(day, {day, comments: 0, prs_opened: 0, active_hours: 0, prompts: 0, api_cost: 0});
+        return m.get(day);
+      };
+      for (const r of claude_tokens) {
+        const p = price[r.model] || price['claude-opus-5-5'];
+        get(r.day).api_cost += (r.input * p.input + r.output * p.output + r.cache_write * p.cache_write + r.cache_read * p.cache_read) / 1e6;
+      }
+      for (const r of claude_activity) { const d = get(r.day); d.active_hours += r.active_hours; d.prompts += r.prompts; }
+      for (const c of github_comments) get(c.day).comments += 1;
+      for (const r of github_threads) if (r.kind === 'PR' && r.mine === 'yes') get(r.created).prs_opened += 1;
+      const days = [...m.keys()].sort();
+      const out = [];
+      for (let t = Date.parse(days[0]); t <= Date.parse(days[days.length - 1]); t += 864e5) out.push(get(new Date(t).toISOString().slice(0, 10)));
+      return out;
+    },
+  });
+
+  dash.calc('efficiency', {
+    title: 'Cost and pace',
+    description: 'Subscription versus API-equivalent cost, and cost and pace per pull request, thread, hour and day.',
+    inputs: ['gh_kpi', 'claude_kpi', 'daily'],
+    fn: (gh_kpi, claude_kpi, daily) => {
+      const g = gh_kpi[0], c = claude_kpi[0];
+      const subscription = 200; // USD per month, the user's plan
+      const days = daily.length;
+      const sub_prorated = subscription * days / 30;
+      return [{
+        subscription,
+        sub_prorated,
+        api_vs_sub: c.cost / subscription,
+        api_vs_prorated: c.cost / sub_prorated,
+        days,
+        period_start: daily[0].day,
+        period_end: daily[days - 1].day,
+        cost_per_pr: c.cost / g.my_prs,
+        cost_per_accepted_pr: c.cost / g.my_prs_accepted,
+        cost_per_thread: c.cost / g.threads,
+        cost_per_hour: c.cost / c.active_hours,
+        sub_per_hour: sub_prorated / c.active_hours,
+        tokens_per_hour: c.tokens / c.active_hours,
+        output_per_hour: c.output / c.active_hours,
+        hours_per_active_day: c.active_hours / c.active_days,
+        tools_per_prompt: c.tool_calls / c.prompts,
+        comments_per_day: g.comments / days,
+        threads_per_day: g.threads / days,
+      }];
+    },
+  });
+</script>
+
+<script>
+  // Shared formatting, colors and helpers.
+  const ru = (o) => new Intl.NumberFormat('ru', o);
+  const dayFmt = new Intl.DateTimeFormat('ru', {day: 'numeric', month: 'short', timeZone: 'UTC'});
+  const dateFmt = new Intl.DateTimeFormat('ru', {day: 'numeric', month: 'long', timeZone: 'UTC'});
+  window.lxF = {
+    int: (v) => ru({maximumFractionDigits: 0}).format(v),
+    compact: (v) => ru({notation: 'compact', maximumFractionDigits: 1}).format(v),
+    usd: (v) => '$' + ru({maximumFractionDigits: 0}).format(v),
+    usd2: (v) => '$' + ru({minimumFractionDigits: 2, maximumFractionDigits: 2}).format(v),
+    h: (v) => ru({maximumFractionDigits: 1}).format(v) + ' ч',
+    pct: (v) => ru({style: 'percent', maximumFractionDigits: 0}).format(v),
+    x: (v) => ru({maximumFractionDigits: 1}).format(v) + '×',
+    d1: (v) => ru({maximumFractionDigits: 1}).format(v),
+    date: (v) => dateFmt.format(new Date(v)),
+    day: (v) => dayFmt.format(new Date(v)).replace('.', ''),
+  };
+  const muted = 'var(--cds-chart-muted)';
+  window.lxOutcomeColor = {merged: dash.colors[0], landed: dash.colors[1], open: dash.colors[2], closed: muted};
+  document.querySelectorAll('.lx-sw[data-k]').forEach((el) => { el.style.background = window.lxOutcomeColor[el.dataset.k]; });
+  document.querySelectorAll('.lx').forEach((el) => { el.style.setProperty('--lx-accent', dash.colors[0]); });
+
+  // Shows the status of a drawing that has no data yet; returns true when data is ready.
+  window.lxReady = (el, r) => {
+    el.classList.toggle('dash-skeleton', r.status === 'loading');
+    if (r.status === 'ok') return true;
+    if (r.status === 'error' || r.status === 'connect' || r.status === 'declined') {
+      const f = document.createElement('div');
+      f.className = 'lx-fail';
+      f.textContent = 'Не загрузилось';
+      el.replaceChildren(f);
+    } else {
+      el.textContent = '—';
+    }
+    return false;
+  };
+
+  window.lxTip = (box) => {
+    const tip = document.createElement('div');
+    tip.className = 'lx-tip';
+    tip.hidden = true;
+    box.appendChild(tip);
+    return {
+      show(ev, head, lines) {
+        tip.replaceChildren();
+        const h = document.createElement('div'); h.className = 'lx-tip-h'; h.textContent = head; tip.appendChild(h);
+        for (const [sw, text] of lines) {
+          const l = document.createElement('div'); l.className = 'lx-tip-v';
+          if (sw) { const s = document.createElement('i'); s.className = 'lx-sw'; s.style.background = sw; s.style.marginRight = '6px'; l.appendChild(s); }
+          l.appendChild(document.createTextNode(text)); tip.appendChild(l);
+        }
+        tip.hidden = false;
+        const b = box.getBoundingClientRect();
+        const x = ev.clientX - b.left, y = ev.clientY - b.top;
+        const w = tip.offsetWidth, hgt = tip.offsetHeight;
+        tip.style.left = Math.max(0, Math.min(b.width - w, x + 12 + w > b.width ? x - w - 12 : x + 12)) + 'px';
+        tip.style.top = Math.max(0, y - hgt - 8) + 'px';
+      },
+      hide() { tip.hidden = true; },
+    };
+  };
+</script>
+
+<script>
+  // Headline numbers.
+  dash.draw('kpi', (el) => {
+    const r = dash.data(el.dataset.source);
+    el.classList.toggle('dash-skeleton', r.status === 'loading');
+    const row = r.status === 'ok' && r.data && r.data[+(el.dataset.row || 0)];
+    const v = row ? row[el.dataset.field] : null;
+    el.textContent = v == null || (typeof v === 'number' && !isFinite(v)) ? '—' : window.lxF[el.dataset.fmt || 'int'](v);
+  });
+
+  // Daily bars, one metric per chart.
+  dash.draw('bars', (el) => {
+    const r = dash.data('daily');
+    if (!window.lxReady(el, r)) return;
+    const metric = el.dataset.metric, fmt = window.lxF[el.dataset.fmt || 'int'];
+    const rows = r.data.map((d) => ({...d, date: new Date(d.day)}));
+    const W = Math.max(240, el.clientWidth), H = 160, m = {t: 18, r: 4, b: 22, l: 4};
+    el.replaceChildren();
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
+    const x = d3.scaleBand(rows.map((d) => d.day), [m.l, W - m.r]).padding(0.25);
+    const max = d3.max(rows, (d) => d[metric]) || 1;
+    const y = d3.scaleLinear([0, max], [H - m.b, m.t]);
+    const bw = Math.min(32, x.bandwidth());
+    const off = (x.bandwidth() - bw) / 2;
+    svg.append('line').attr('x1', m.l).attr('x2', W - m.r).attr('y1', H - m.b).attr('y2', H - m.b).attr('stroke', 'var(--cds-chart-axis)');
+    const tip = window.lxTip(el);
+    svg.append('g').selectAll('rect').data(rows).join('rect')
+      .attr('x', (d) => x(d.day) + off).attr('width', bw)
+      .attr('y', (d) => y(d[metric])).attr('height', (d) => Math.max(0, H - m.b - y(d[metric])))
+      .attr('rx', 3).attr('fill', dash.colors[0])
+      .on('pointermove', (ev, d) => tip.show(ev, window.lxF.date(d.day), [[null, fmt(d[metric])]]))
+      .on('pointerleave', () => tip.hide());
+    if (bw >= 22) {
+      svg.append('g').selectAll('text').data(rows.filter((d) => d[metric] > 0)).join('text').attr('class', 'lx-val')
+        .attr('x', (d) => x(d.day) + x.bandwidth() / 2).attr('y', (d) => y(d[metric]) - 4).attr('text-anchor', 'middle')
+        .text((d) => metric === 'api_cost' ? window.lxF.int(d[metric]) : fmt(d[metric]));
+    }
+    const every = x.bandwidth() < 34 ? 2 : 1;
+    svg.append('g').selectAll('text').data(rows.filter((d, i) => i % every === 0)).join('text')
+      .attr('x', (d) => x(d.day) + x.bandwidth() / 2).attr('y', H - 6).attr('text-anchor', 'middle')
+      .text((d) => window.lxF.day(d.day));
+  });
+
+  // Pull request outcomes as two stacked bars.
+  dash.draw('outcomes', (el) => {
+    const r = dash.data('pr_outcomes');
+    if (!window.lxReady(el, r)) return;
+    const labels = {mine: 'Мои PR', others: 'Чужие PR'};
+    const names = {merged: 'влит', landed: 'влит вручную', open: 'открыт', closed: 'закрыт без мержа'};
+    el.replaceChildren();
+    const W = Math.max(240, el.clientWidth), rowH = 30, gap = 34, H = 2 * rowH + gap + 16;
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
+    const groups = ['mine', 'others'];
+    const total = d3.max(groups, (g) => d3.sum(r.data.filter((d) => d.group === g), (d) => d.count)) || 1;
+    const x = d3.scaleLinear([0, total], [0, W]);
+    const tip = window.lxTip(el);
+    groups.forEach((g, gi) => {
+      const y0 = gi * (rowH + gap) + 16;
+      const segs = r.data.filter((d) => d.group === g);
+      const sum = d3.sum(segs, (d) => d.count);
+      svg.append('text').attr('x', 0).attr('y', y0 - 5).text(`${labels[g]} · ${window.lxF.int(sum)}`);
+      let acc = 0;
+      for (const s of segs) {
+        if (!s.count) continue;
+        const x0 = x(acc), w = x(acc + s.count) - x(acc);
+        svg.append('rect').attr('x', x0 + 1).attr('y', y0).attr('width', Math.max(0, w - 2)).attr('height', rowH).attr('rx', 3)
+          .attr('fill', window.lxOutcomeColor[s.outcome])
+          .on('pointermove', (ev) => tip.show(ev, labels[g], [[window.lxOutcomeColor[s.outcome], `${names[s.outcome]}: ${window.lxF.int(s.count)}`]]))
+          .on('pointerleave', () => tip.hide());
+        if (w > 22) svg.append('text').attr('class', 'lx-val').attr('x', x0 + w / 2).attr('y', y0 + rowH / 2 + 4).attr('text-anchor', 'middle')
+          .style('fill', s.outcome === 'closed' ? 'var(--color-fg)' : 'var(--color-bg)').style('pointer-events', 'none').text(window.lxF.int(s.count));
+        acc += s.count;
+      }
+    });
+  });
+
+  // API cost split by token type.
+  dash.draw('mix', (el) => {
+    const r = dash.data('cost_mix');
+    if (!window.lxReady(el, r)) return;
+    const names = {cache_read: 'Чтение из кэша', output: 'Вывод модели', cache_write: 'Запись в кэш', input: 'Ввод без кэша'};
+    const col = (i) => dash.colors[i % dash.colors.length];
+    el.replaceChildren();
+    const total = d3.sum(r.data, (d) => d.cost) || 1;
+    const W = Math.max(240, el.clientWidth), H = 28;
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
+    const tip = window.lxTip(el);
+    let acc = 0;
+    r.data.forEach((d, i) => {
+      const w = d.cost / total * W;
+      svg.append('rect').attr('x', acc + 1).attr('y', 0).attr('width', Math.max(0, w - 2)).attr('height', H).attr('rx', 3).attr('fill', col(i))
+        .on('pointermove', (ev) => tip.show(ev, names[d.type], [[col(i), `${window.lxF.usd(d.cost)} · ${window.lxF.pct(d.cost / total)}`]]))
+        .on('pointerleave', () => tip.hide());
+      acc += w;
+    });
+    const list = document.createElement('div');
+    list.style.marginTop = 'var(--cds-gap-md)';
+    r.data.forEach((d, i) => {
+      const row = document.createElement('div'); row.className = 'lx-mix-row';
+      const sw = document.createElement('i'); sw.className = 'lx-sw'; sw.style.background = col(i);
+      const n = document.createElement('span'); n.textContent = names[d.type];
+      const t = document.createElement('span'); t.className = 'lx-dim'; t.textContent = window.lxF.compact(d.tokens) + ' ток.';
+      const c = document.createElement('span'); c.className = 'lx-cost'; c.textContent = window.lxF.usd(d.cost);
+      row.append(sw, n, t, c); list.appendChild(row);
+    });
+    el.appendChild(list);
+  });
+
+  // Tool calls as horizontal bars.
+  dash.draw('tools', (el) => {
+    const r = dash.data('claude_tools');
+    if (!window.lxReady(el, r)) return;
+    const rows = r.data.filter((d) => d.tool !== 'other');
+    el.replaceChildren();
+    const W = Math.max(240, el.clientWidth), rowH = 20, H = rows.length * rowH + 4;
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
+    const probe = svg.append('text').text('x');
+    const labelW = Math.min(W * 0.45, d3.max(rows, (d) => { probe.text(d.tool); return probe.node().getComputedTextLength(); }) + 8);
+    probe.text(window.lxF.int(d3.max(rows, (d) => d.calls)));
+    const valW = probe.node().getComputedTextLength() + 8;
+    probe.remove();
+    const x = d3.scaleLinear([0, d3.max(rows, (d) => d.calls) || 1], [0, W - labelW - valW]);
+    const tip = window.lxTip(el);
+    rows.forEach((d, i) => {
+      const y = i * rowH + 2;
+      svg.append('text').attr('x', 0).attr('y', y + 13).text(d.tool);
+      svg.append('rect').attr('x', labelW).attr('y', y + 3).attr('height', rowH - 6).attr('width', Math.max(1, x(d.calls))).attr('rx', 3)
+        .attr('fill', i === 0 ? dash.colors[0] : 'var(--cds-chart-muted)')
+        .on('pointermove', (ev) => tip.show(ev, d.tool, [[null, window.lxF.int(d.calls) + ' вызовов']]))
+        .on('pointerleave', () => tip.hide());
+      svg.append('text').attr('class', 'lx-val').attr('x', labelW + x(d.calls) + 4).attr('y', y + 13).text(window.lxF.int(d.calls));
+    });
+  });
+</script>
+
+<script>
+  // Threads table: search, filters and sorting.
+  window.lxT = {sort: 'number', dir: -1, q: '', kind: '', mine: ''};
+  const redraw = () => { dash.draw('threads'); dash.draw('shown'); };
+  document.querySelectorAll('.lx-q').forEach((el) => el.addEventListener('input', () => { window.lxT.q = el.value.trim().toLowerCase(); redraw(); }));
+  document.querySelectorAll('.lx-kind').forEach((el) => el.addEventListener('change', () => { window.lxT.kind = el.value; redraw(); }));
+  document.querySelectorAll('.lx-mine').forEach((el) => el.addEventListener('change', () => { window.lxT.mine = el.value; redraw(); }));
+  document.querySelectorAll('button[data-sort]').forEach((btn) => btn.addEventListener('click', () => {
+    const k = btn.dataset.sort, T = window.lxT;
+    if (T.sort === k) T.dir = -T.dir; else { T.sort = k; T.dir = ['title', 'kind', 'author', 'outcome'].includes(k) ? 1 : -1; }
+    document.querySelectorAll('th[data-field]').forEach((th) => {
+      if (!th.querySelector('button[data-sort]')) return;
+      if (th.dataset.field === k) th.setAttribute('aria-sort', T.dir > 0 ? 'ascending' : 'descending'); else th.removeAttribute('aria-sort');
+    });
+    redraw();
+  }));
+
+  window.lxRows = () => {
+    const r = dash.data('github_threads');
+    if (r.status !== 'ok') return null;
+    const T = window.lxT;
+    const rows = r.data.filter((d) => (!T.kind || d.kind === T.kind) && (!T.mine || d.mine === T.mine) &&
+      (!T.q || `${d.number} ${d.title} ${d.author}`.toLowerCase().includes(T.q)));
+    const k = T.sort;
+    rows.sort((a, b) => (typeof a[k] === 'number' ? a[k] - b[k] : String(a[k]).localeCompare(String(b[k]))) * T.dir);
+    return {rows, total: r.data.length};
+  };
+
+  dash.draw('shown', (el) => {
+    const s = window.lxRows();
+    el.textContent = s ? `${window.lxF.int(s.rows.length)} из ${window.lxF.int(s.total)}` : '—';
+  });
+
+  dash.draw('threads', (el) => {
+    const s = window.lxRows();
+    el.replaceChildren();
+    if (!s) return;
+    const cols = [['number', 'num0'], ['title', 'link'], ['kind', 'hide'], ['author', 'hide'], ['outcome', 'pill'], ['my_comments', 'num'], ['additions', 'numhide'], ['deletions', 'numhide'], ['created', 'hide']];
+    for (const d of s.rows) {
+      const tr = document.createElement('tr');
+      if (d.mine === 'yes') tr.className = 'lx-mine';
+      for (const [k, kind] of cols) {
+        const td = document.createElement('td');
+        if (kind === 'num' || kind === 'numhide') td.className = 'lx-num';
+        if (kind === 'hide' || kind === 'numhide') td.classList.add('lx-hide');
+        if (kind === 'link' && /^https:\/\/github\.com\//.test(d.url)) {
+          const a = document.createElement('a'); a.href = d.url; a.target = '_blank'; a.rel = 'noopener'; a.textContent = d[k]; td.appendChild(a);
+        } else if (kind === 'pill') {
+          const p = document.createElement('span'); p.className = 'lx-pill'; p.textContent = d[k];
+          p.style.borderColor = window.lxOutcomeColor[d[k]] || 'var(--color-border-line)'; td.appendChild(p);
+        } else {
+          td.textContent = String(d[k]);
+        }
+        tr.appendChild(td);
+      }
+      el.appendChild(tr);
+    }
+  });
+
+  dash.draw('prices', (el) => {
+    const r = dash.data('api_prices');
+    el.replaceChildren();
+    if (r.status !== 'ok') return;
+    for (const d of r.data) {
+      const tr = document.createElement('tr');
+      for (const k of ['model', 'input', 'output', 'cache_write', 'cache_read']) {
+        const td = document.createElement('td');
+        if (k !== 'model') td.className = 'lx-num';
+        td.textContent = String(d[k]);
+        tr.appendChild(td);
+      }
+      el.appendChild(tr);
+    }
+  });
+</script>
