@@ -36,7 +36,67 @@
 },
 {
 "day": "2026-11-07",
-"active_hours": 0.93,
-"prompts": 5
+"active_hours": 6.72,
+"prompts": 30
+},
+{
+"day": "2026-11-08",
+"active_hours": 1.27,
+"prompts": 6
+},
+{
+"day": "2026-11-09",
+"active_hours": 11.57,
+"prompts": 33
+},
+{
+"day": "2026-11-10",
+"active_hours": 12.02,
+"prompts": 64
+},
+{
+"day": "2026-11-11",
+"active_hours": 4.21,
+"prompts": 21
+},
+{
+"day": "2026-11-12",
+"active_hours": 3.96,
+"prompts": 21
+},
+{
+"day": "2026-11-13",
+"active_hours": 1.37,
+"prompts": 15
+},
+{
+"day": "2026-11-14",
+"active_hours": 5.94,
+"prompts": 15
+},
+{
+"day": "2026-11-15",
+"active_hours": 4.13,
+"prompts": 20
+},
+{
+"day": "2026-11-16",
+"active_hours": 3.21,
+"prompts": 26
+},
+{
+"day": "2026-11-17",
+"active_hours": 7.35,
+"prompts": 27
+},
+{
+"day": "2026-11-18",
+"active_hours": 1.9,
+"prompts": 12
+},
+{
+"day": "2026-11-19",
+"active_hours": 2.88,
+"prompts": 9
 }
 ]
