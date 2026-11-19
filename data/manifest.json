@@ -1,14 +1,14 @@
 {
- "generated_at": "2026-11-19T16:38:33Z",
+ "generated_at": "2026-11-19T16:51:39Z",
  "repo": "valentderah/totk-pc-recomp",
  "user": "itaskaev2",
- "sessions": 11,
+ "sessions": 7,
  "threads": 195,
  "comments": 271,
  "my_prs": 45,
  "my_prs_accepted": 32,
- "tokens": 5243159839,
- "active_hours": 106.8,
+ "tokens": 4141130386,
+ "active_hours": 86.5,
  "files": [
   "api_prices.json",
   "claude_activity.json",

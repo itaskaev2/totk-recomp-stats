@@ -1,39 +1,35 @@
 [
 {
 "tool": "Bash",
-"calls": 12067
+"calls": 9532
 },
 {
 "tool": "Read",
-"calls": 1165
+"calls": 811
 },
 {
 "tool": "update_plan",
-"calls": 695
-},
-{
-"tool": "Edit",
-"calls": 439
+"calls": 590
 },
 {
 "tool": "PowerShell",
-"calls": 418
+"calls": 372
 },
 {
 "tool": "Write",
-"calls": 401
+"calls": 328
 },
 {
 "tool": "wrap_up",
-"calls": 363
+"calls": 324
+},
+{
+"tool": "Edit",
+"calls": 316
 },
 {
 "tool": "ToolSearch",
-"calls": 120
-},
-{
-"tool": "Grep",
-"calls": 82
+"calls": 104
 },
 {
 "tool": "chrome:javascript_tool",
@@ -41,22 +37,26 @@
 },
 {
 "tool": "TaskStop",
-"calls": 58
+"calls": 48
 },
 {
 "tool": "Agent",
-"calls": 51
-},
-{
-"tool": "SendUserFile",
-"calls": 32
+"calls": 39
 },
 {
 "tool": "chrome:find",
 "calls": 32
 },
 {
+"tool": "SendUserFile",
+"calls": 31
+},
+{
+"tool": "chrome:navigate",
+"calls": 31
+},
+{
 "tool": "other",
-"calls": 346
+"calls": 303
 }
 ]

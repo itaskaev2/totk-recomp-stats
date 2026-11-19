@@ -41,18 +41,18 @@
 },
 {
 "day": "2026-11-08",
-"active_hours": 1.27,
-"prompts": 6
+"active_hours": 0.66,
+"prompts": 3
 },
 {
 "day": "2026-11-09",
-"active_hours": 11.57,
-"prompts": 33
+"active_hours": 0.29,
+"prompts": 3
 },
 {
 "day": "2026-11-10",
-"active_hours": 12.02,
-"prompts": 64
+"active_hours": 7.51,
+"prompts": 34
 },
 {
 "day": "2026-11-11",
@@ -66,8 +66,8 @@
 },
 {
 "day": "2026-11-13",
-"active_hours": 1.37,
-"prompts": 15
+"active_hours": 0.84,
+"prompts": 10
 },
 {
 "day": "2026-11-14",
@@ -86,8 +86,8 @@
 },
 {
 "day": "2026-11-17",
-"active_hours": 7.35,
-"prompts": 27
+"active_hours": 3.81,
+"prompts": 19
 },
 {
 "day": "2026-11-18",
@@ -96,7 +96,7 @@
 },
 {
 "day": "2026-11-19",
-"active_hours": 2.88,
+"active_hours": 3.11,
 "prompts": 9
 }
 ]
